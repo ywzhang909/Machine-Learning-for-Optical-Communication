@@ -1,0 +1,11 @@
+{
+    "python.defaultInterpreterPath": "d:\\Projects\\Machine-Learning-for-Optical-Communication\\.venv\\Scripts\\python.exe",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    },
+    "hide-files.files": []
+}

@@ -5,6 +5,19 @@ from .beams.hg import hg as _hg_base
 from .beams.ig import ig as _ig_base
 from .propagation.propagation import propagation as _prop_base
 from .propagation.turbulence import turbulence as _turb_base
+from .propagation.lens import (
+    lens_phase as _lens_phase,
+    apply_lens as _apply_lens,
+    lens_focal_spot_size as _lens_focal_spot_size,
+    lens_fft_propagation_to_focal as _lens_fft_propagation_to_focal
+)
+from .propagation.slm import (
+    zernike_polynomial, zernike_name, noll_to_nm,
+    generate_zernike_map, zernike_basis,
+    slm_phase_from_zernike, fit_zernike_to_phase,
+    compensate_turbulence_phase, apply_slm_correction,
+    simulate_slm, adaptive_optic_correction
+)
 
 # --- Global configuration---
 _default_config = None
@@ -67,3 +80,42 @@ def propagation(E, z=None, cfg=None, **kwargs):
 def turbulence(cfg=None, **kwargs):
     cfg = cfg or get_default_config()
     return _turb_base(cfg=cfg, **kwargs)
+
+
+# --- Lens functions ---
+def lens_phase(f, cfg=None):
+    """Generate thin lens phase function."""
+    cfg = cfg or get_default_config()
+    return _lens_phase(cfg=cfg, f=f)
+
+
+def apply_lens(E, f, cfg=None):
+    """Apply lens phase to an optical field."""
+    cfg = cfg or get_default_config()
+    return _apply_lens(E=E, cfg=cfg, f=f)
+
+
+def lens_focal_spot_size(f, cfg=None, wavelength=None):
+    """Calculate theoretical Airy disk size at focal plane."""
+    cfg = cfg or get_default_config()
+    return _lens_focal_spot_size(cfg=cfg, f=f, wavelength=wavelength)
+
+
+def lens_fft_propagation_to_focal(E, f, z_prop=0, cfg=None):
+    """Propagate through lens to focal plane."""
+    cfg = cfg or get_default_config()
+    return _lens_fft_propagation_to_focal(E=E, cfg=cfg, f=f, z_prop=z_prop)
+
+
+# --- SLM/Zernike functions ---
+def slm_phase(coeffs, cfg=None):
+    """Generate SLM phase from Zernike coefficients."""
+    cfg = cfg or get_default_config()
+    X, Y = cfg.grid()
+    return slm_phase_from_zernike(coefficients=coeffs, x=X, y=Y)
+
+
+def slm_correct(E, turbulence_phase=None, zernike_coeffs=None, cfg=None):
+    """Apply SLM phase correction."""
+    cfg = cfg or get_default_config()
+    return simulate_slm(E=E, cfg=cfg, turbulence_phase=turbulence_phase, zernike_coeffs=zernike_coeffs)
